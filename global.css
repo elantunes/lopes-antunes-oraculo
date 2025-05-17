@@ -1,0 +1,28 @@
+* {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+body {
+    background-color: black;
+    color: white;
+}
+
+#data-hora {
+    display: inline-block;
+    position: absolute;
+    text-align: center;
+    width: fit-content;
+}
+
+#data-hora-hora {
+    font-size: 110pt;
+}
+
+#data-hora-dia-semana {
+    font-size: 90pt;
+}
+
+#data-hora-data {
+    font-size: 70pt;
+}
