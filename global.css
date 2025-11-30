@@ -3,9 +3,21 @@
     margin: 0;
     padding: 0;
 }
+
+html {
+	height: 100vh;
+	width: 100vw;
+}
+
 body {
     background-color: black;
     color: white;
+	height: 100vh;
+	width: 100vw;
+}
+
+body.cursor-hidden {
+    cursor: none;
 }
 
 #data-hora {

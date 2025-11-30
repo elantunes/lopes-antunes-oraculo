@@ -16,6 +16,30 @@
             const minuto = segundo * 60;
             const intervaloAtulizacaoDataHora = segundo * 20;
             const intervaloReposicionamento = minuto * 5;
+            const tempoInatividadeCursor = minuto * 5; // 5 minutos
+
+            let timeoutCursor;
+
+            function mostrarCursor() {
+                document.body.classList.remove('cursor-hidden');
+                clearTimeout(timeoutCursor);
+                timeoutCursor = setTimeout(ocultarCursor, tempoInatividadeCursor);
+            }
+
+            function ocultarCursor() {
+                document.body.classList.add('cursor-hidden');
+                console.log('Cursor ocultado por inatividade');
+            }
+
+            // Eventos que indicam interação do usuário
+            const eventosInteracao = ['mousemove', 'mousedown', 'mouseup', 'click', 'touchstart', 'touchmove', 'keydown', 'scroll'];
+            
+            eventosInteracao.forEach(evento => {
+                document.addEventListener(evento, mostrarCursor, { passive: true });
+            });
+
+            // Inicia o timeout para ocultar o cursor após o tempo de inatividade
+            timeoutCursor = setTimeout(ocultarCursor, tempoInatividadeCursor);
 
             atualizarDataHora();
 
