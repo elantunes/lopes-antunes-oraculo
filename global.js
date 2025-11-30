@@ -1,3 +1,23 @@
+// Cache de elementos DOM para evitar queries repetidas
+const elementos = {
+    dataHora: null,
+    dataHoraHora: null,
+    dataHoraDiaSemana: null,
+    dataHoraData: null
+};
+
+// Inicializa cache de elementos DOM
+function inicializarElementos() {
+    elementos.dataHora = document.querySelector('#data-hora');
+    elementos.dataHoraHora = document.querySelector('#data-hora-hora');
+    elementos.dataHoraDiaSemana = document.querySelector('#data-hora-dia-semana');
+    elementos.dataHoraData = document.querySelector('#data-hora-data');
+}
+
+// Formatters reutilizáveis para melhor performance
+const formatadorMes = new Intl.DateTimeFormat('pt-BR', { month: 'long' });
+const formatadorDiaSemana = new Intl.DateTimeFormat('pt-BR', { weekday: 'long' });
+
 function atualizarDataHora() {
     const agora = new Date();
     exibirData(agora);
@@ -11,9 +31,13 @@ function atualizarDataHora() {
  */
 function exibirData(data) {
     const ano = data.getFullYear();
-    const mes = data.toLocaleString('pt-BR', { month: 'long' });
+    const mes = formatadorMes.format(data);
     const dia = data.getDate();
-    document.querySelector('#data-hora-data').innerHTML = `${dia} ${mes} ${ano}`;
+    const texto = `${dia} ${mes} ${ano}`;
+    
+    // Só atualiza se o conteúdo mudou
+    if (elementos.dataHoraData.textContent !== texto)
+        elementos.dataHoraData.textContent = texto;
 }
 
 
@@ -23,8 +47,11 @@ function exibirData(data) {
  * @param {Date} data - Data para obter o dia da semana.
  */
 function exibirDiaDaSemana(data) {
-    const diaSemana = new Intl.DateTimeFormat('pt-BR', { weekday: 'long' }).format(data).replace('-feira', '');
-    document.querySelector('#data-hora-dia-semana').textContent = diaSemana;
+    const diaSemana = formatadorDiaSemana.format(data).replace('-feira', '');
+    
+    // Só atualiza se o conteúdo mudou
+    if (elementos.dataHoraDiaSemana.textContent !== diaSemana)
+        elementos.dataHoraDiaSemana.textContent = diaSemana;
 }
 
 
@@ -34,7 +61,11 @@ function exibirDiaDaSemana(data) {
  */
 
 function exibirHora(data) {
-    document.querySelector('#data-hora-hora').innerHTML = data.toTimeString().slice(0, 5);
+    const hora = data.toTimeString().slice(0, 5);
+    
+    // Só atualiza se o conteúdo mudou
+    if (elementos.dataHoraHora.textContent !== hora)
+        elementos.dataHoraHora.textContent = hora;
 }
 
 
@@ -44,8 +75,7 @@ function exibirHora(data) {
  * janela e esteja visível.
  */
 function posicionarDataHoraAleatoriamente() {
-    const elem = document.querySelector('#data-hora');
-    const retangulo = elem.getBoundingClientRect();
-    elem.style.top = `${Math.floor(Math.random() * (window.innerHeight - retangulo.height))}px`;
-    elem.style.left = `${Math.floor(Math.random() * (window.innerWidth - retangulo.width))}px`;
+    const retangulo = elementos.dataHora.getBoundingClientRect();
+    elementos.dataHora.style.top = `${Math.floor(Math.random() * (window.innerHeight - retangulo.height))}px`;
+    elementos.dataHora.style.left = `${Math.floor(Math.random() * (window.innerWidth - retangulo.width))}px`;
 }
