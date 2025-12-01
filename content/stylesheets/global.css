@@ -35,6 +35,7 @@
 
 * {
     font-family: 'Quicksand', Arial, sans-serif;
+	font-weight: 500;
     margin: 0;
     padding: 0;
 }
@@ -58,6 +59,7 @@ body.cursor-hidden {
 
 #data-hora {
     position: absolute;
+	text-align: center;
 }
 
 #data-hora-hora {
@@ -70,4 +72,109 @@ body.cursor-hidden {
 
 #data-hora-data {
     font-size: 70pt;
+}
+
+/* Estilos do relógio */
+:root{
+    --bg: #071018;
+    --fg: #fff;
+}
+
+.blink {
+    animation: softBlink 1s ease-in-out infinite;
+}
+
+.clock {
+    align-items: center;
+    display: flex;
+    font-size: 120pt;
+    font-weight: 500;
+    gap: 2px;
+    justify-content: center;
+    line-height: 1;
+    user-select: none;
+}
+
+.digit {
+    align-items: center;
+    display: flex;
+    height: 120pt;
+    justify-content: center;
+    overflow: hidden;
+    position: relative;
+    width: 70pt;
+}
+
+.dot {
+    background: var(--fg);
+    border-radius: 50%;
+    height: 15pt;
+    width: 15pt;
+}
+
+.hidden {
+    display: none;
+}
+
+.new {
+    opacity: 0;
+    transform: translateY(-100%);
+}
+
+.new.flip {
+    animation: slideDown 420ms cubic-bezier(.2,.8,.2,1) forwards;
+}
+
+.old {
+    transform: translateY(0);
+}
+
+.old.flip {
+    animation: slideUp 420ms cubic-bezier(.2,.8,.2,1) forwards;
+}
+
+.panel {
+    align-items: center;
+    display: flex;
+    height: 100%;
+    justify-content: center;
+    left: 0;
+    pointer-events: none;
+    position: absolute;
+    top: 0;
+    width: 100%;
+}
+
+.panel span{
+    display: block;
+    line-height: 1;
+    -webkit-font-smoothing: antialiased;
+}
+
+.sep {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    justify-content: center;
+    margin-top: 2px;
+    width: 35pt;
+}
+
+@keyframes slideDown {
+    0%   { transform: translateY(-100%); opacity: 0; }
+    30%  { transform: translateY(-30%); opacity: .6; }
+    100% { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes softBlink {
+    0%   { opacity: 1; }
+    50%  { opacity: .3; }
+    100% { opacity: 1; }
+}
+
+@keyframes slideUp {
+    0%   { transform: translateY(0); opacity: 1; }
+    70%  { transform: translateY(85%); opacity: .6; }
+    100% { transform: translateY(100%); opacity: 0; }
 }

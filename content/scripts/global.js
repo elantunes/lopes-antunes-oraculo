@@ -14,7 +14,6 @@ function atualizarDataHora() {
     const agora = new Date();
     exibirData(agora);
     exibirDiaDaSemana(agora);
-    exibirHora(agora);
 }
 
 /**
@@ -49,14 +48,6 @@ function exibirDiaDaSemana(data) {
  * Exibe a hora no formato "HH:MM" no container com id "data-hora-hora".
  * @param {Date} data - Data a partir da qual a hora será extraída.
  */
-
-function exibirHora(data) {
-    const hora = data.toTimeString().slice(0, 5);
-    
-    // Só atualiza se o conteúdo mudou
-    if (elementos.dataHoraHora.textContent !== hora)
-        elementos.dataHoraHora.textContent = hora;
-}
 
 // Inicializa cache de elementos DOM
 function inicializarElementos() {
@@ -106,12 +97,103 @@ function posicionarDataHoraAleatoriamente() {
 const segundo = 1000;
 const minuto = segundo * 60;
 const intervaloAtulizacaoDataHora = segundo * 20;
-const intervaloReposicionamento = minuto * .2;
-const tempoInatividadeCursor = minuto * .1; // 5 minutos
+const intervaloReposicionamento = minuto * 10; // 10 minutos
+const tempoInatividadeCursor = minuto * 5; // 5 minutos
 
 let timeoutCursor;
 let ultimaAtualizacaoCursor = 0;
 const throttleCursor = 100; // Throttle de 100ms para mousemove
+
+// Relógio digital com animação
+const teste = false;
+
+function animateDigit(el, newChar){
+    const current = el.getAttribute('data-value') ?? '';
+    
+    if(current === newChar) return;
+    
+    el.innerHTML = '';
+    
+    const oldPanel = document.createElement('div');
+    oldPanel.className = 'panel old';
+    const oldSpan = document.createElement('span');
+    oldSpan.textContent = (current === '') ? newChar : current;
+    oldPanel.appendChild(oldSpan);
+    
+    const newPanel = document.createElement('div');
+    newPanel.className = 'panel new';
+    const newSpan = document.createElement('span');
+    newSpan.textContent = newChar;
+    newPanel.appendChild(newSpan);
+    
+    el.appendChild(oldPanel);
+    el.appendChild(newPanel);
+    
+    void el.offsetWidth;
+    
+    if(current === ''){
+        oldPanel.classList.remove('old');
+        oldPanel.classList.add('panel');
+        el.setAttribute('data-value', newChar);
+        newPanel.style.display = 'none';
+        return;
+    }
+    
+    oldPanel.classList.add('flip');
+    newPanel.classList.add('flip');
+    
+    setTimeout(()=>{
+        el.innerHTML = `<div class="panel old"><span>${newChar}</span></div>`;
+        el.setAttribute('data-value', newChar);
+    }, 430);
+}
+
+function tick(){
+    const now = new Date();
+    const h = String(now.getHours()).padStart(2,'0');
+    const m = String(now.getMinutes()).padStart(2,'0');
+    const s = String(now.getSeconds()).padStart(2,'0');
+    
+    animateDigit(document.getElementById('h1'), h[0]);
+    animateDigit(document.getElementById('h2'), h[1]);
+    
+    animateDigit(document.getElementById('m1'), m[0]);
+    animateDigit(document.getElementById('m2'), m[1]);
+    
+    animateDigit(document.getElementById('s1'), s[0]);
+    animateDigit(document.getElementById('s2'), s[1]);
+}
+
+function initClock(){
+    const now = new Date();
+    const h = String(now.getHours()).padStart(2,'0');
+    const m = String(now.getMinutes()).padStart(2,'0');
+    const s = String(now.getSeconds()).padStart(2,'0');
+    
+    let ids = [];
+    
+    if (!teste)
+        ids = ['h1', 'h2', 'm1', 'm2'];
+    else
+        ids = ['h1', 'h2', 'm1', 'm2', 's1', 's2'];
+    
+    let vals = [];
+    
+    if (!teste)
+        vals = [h[0], h[1], m[0], m[1]];
+    else
+        vals = [h[0], h[1], m[0], m[1], s[0], s[1]];
+    
+    ids.forEach((id,i)=>{
+        const el = document.getElementById(id);
+        if (el) {
+            el.setAttribute('data-value', vals[i]);
+            el.innerHTML = `<div class="panel old"><span>${vals[i]}</span></div>`;
+        }
+    });
+    
+    setInterval(tick, 1000);
+}
 
 // Inicialização
 (function init() {
@@ -138,6 +220,9 @@ const throttleCursor = 100; // Throttle de 100ms para mousemove
     // Inicializa elementos DOM antes de usar
     inicializarElementos();
     atualizarDataHora();
+    
+    // Inicializa o relógio digital
+    initClock();
 
     setInterval(atualizarDataHora, intervaloAtulizacaoDataHora);
     setInterval(posicionarDataHoraAleatoriamente, intervaloReposicionamento);
