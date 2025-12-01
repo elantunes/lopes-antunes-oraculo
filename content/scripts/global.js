@@ -106,7 +106,7 @@ function posicionarDataHoraAleatoriamente() {
 const segundo = 1000;
 const minuto = segundo * 60;
 const intervaloAtulizacaoDataHora = segundo * 20;
-const intervaloReposicionamento = minuto * 5;
+const intervaloReposicionamento = minuto * .2;
 const tempoInatividadeCursor = minuto * .1; // 5 minutos
 
 let timeoutCursor;

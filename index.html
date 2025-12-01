@@ -5,11 +5,232 @@
         <link rel="stylesheet" href="content/stylesheets/global.css" />
     </head>
     <body>
-        <div id="data-hora">
+        <div id="data-hora" style="display: none;">
             <h1 id="data-hora-hora"></h1>
             <h1 id="data-hora-dia-semana"></h1>
             <h1 id="data-hora-data"></h1>
         </div>
+
+		<!---NOVO-->
+		<div class="clock">
+
+			<div class="digit" id="h1"></div>
+			<div class="digit" id="h2"></div>
+	
+			<div class="sep blink">
+				<div>
+					<div class="dot"></div>
+				</div>
+				<div>
+					<div class="dot"></div>
+				</div>
+			</div>
+		
+			<div class="digit" id="m1"></div>
+			<div class="digit" id="m2"></div>
+		
+			<div class="sep blink" class="hidden">
+				<div>
+					<div class="dot"></div>
+				</div>
+				<div>
+					<div class="dot"></div>
+				</div>
+			</div>
+		
+			<div class="digit" id="s1" class=""></div>
+			<div class="digit" id="s2" class=""></div>
+		
+		</div>
+	<style>
+		:root{
+			--bg: #071018;
+			--fg: #fff;
+		}
+
+		.blink {
+			animation: softBlink 1s ease-in-out infinite;
+		}
+
+		.clock {
+			align-items: center;
+			display: flex;
+			font-size: 92px;
+			font-weight: 500;
+			gap: 2px;
+			line-height: 1;
+			user-select: none;
+		}
+
+		.digit {
+			align-items: center;
+			display: flex;
+			height: 100px;
+			justify-content: center;
+			perspective: 900px;
+			overflow: visible;
+			position: relative;
+			width: 64px;
+		}
+
+		.dot {
+			background: var(--fg);
+			border-radius: 50%;
+			height: 14px;
+			width: 14px;
+		}
+
+		.hidden {
+			display: none;
+		}
+
+		.new {
+			opacity: 0;
+			transform-origin: center top;
+			transform: rotateX(90deg);
+		}
+
+		.new.flip {
+			animation: bottomFlip 420ms cubic-bezier(.2,.8,.2,1) forwards;
+		}
+
+		.old {
+			transform-origin: center bottom;
+		}
+
+		.old.flip {
+			animation: topFlip 420ms cubic-bezier(.2,.8,.2,1) forwards;
+		}
+
+		.panel {
+			align-items: center;
+			backface-visibility: hidden;
+			display: flex;
+			height: 100%;
+			justify-content: center;
+			left: 0;
+			pointer-events: none;
+			position: absolute;
+			top: 0;
+			transform-style: preserve-3d;
+			width: 100%;
+		}
+
+		.panel span{
+			display: block;
+			line-height: 1;
+			-webkit-font-smoothing: antialiased;
+		}
+
+		.sep {
+			align-items: center;
+			display: flex;
+			flex-direction: column;
+			gap: 18px;
+			justify-content: center;
+			margin-top: 2px;
+			width: 26px;
+		}
+
+		@keyframes bottomFlip {
+			0%   { transform: rotateX(90deg); opacity: 0; }
+			30%  { transform: rotateX(30deg); opacity: .6; }
+			100% { transform: rotateX(0deg); opacity: 1; }
+		}
+
+		@keyframes softBlink {
+			0%   { opacity: 1; }
+			50%  { opacity: .2; }
+			100% { opacity: 1; }
+		}
+
+		@keyframes topFlip {
+			0%   { transform: rotateX(0deg); opacity: 1; }
+			70%  { transform: rotateX(-85deg); opacity: .6; }
+			100% { transform: rotateX(-90deg); opacity: 0; }
+		}
+
+	</style>
+		<script>
+			function animateDigit(el, newChar){
+
+				const current = el.getAttribute('data-value') ?? '';
+			
+				if(current === newChar) return;
+			
+				el.innerHTML = '';
+			
+				const oldPanel = document.createElement('div');
+				oldPanel.className = 'panel old';
+				const oldSpan = document.createElement('span');
+				oldSpan.textContent = (current === '') ? newChar : current;
+				oldPanel.appendChild(oldSpan);
+			
+				const newPanel = document.createElement('div');
+				newPanel.className = 'panel new';
+				const newSpan = document.createElement('span');
+				newSpan.textContent = newChar;
+				newPanel.appendChild(newSpan);
+			
+				el.appendChild(oldPanel);
+				el.appendChild(newPanel);
+			
+				void el.offsetWidth;
+			
+				if(current === ''){
+				 	oldPanel.classList.remove('old');
+				 	oldPanel.classList.add('panel');
+				 	el.setAttribute('data-value', newChar);
+				 	newPanel.style.display = 'none';
+				 	return;
+				}
+			
+				oldPanel.classList.add('flip');
+				newPanel.classList.add('flip');
+			
+				setTimeout(()=>{
+				 	el.innerHTML = `<div class="panel old"><span>${newChar}</span></div>`;
+				 	el.setAttribute('data-value', newChar);
+				}, 430);
+			}
+			
+			function tick(){
+				const now = new Date();
+				const h = String(now.getHours()).padStart(2,'0');
+				const m = String(now.getMinutes()).padStart(2,'0');
+				const s = String(now.getSeconds()).padStart(2,'0');
+			
+				animateDigit(document.getElementById('h1'), h[0]);
+				animateDigit(document.getElementById('h2'), h[1]);
+			
+				animateDigit(document.getElementById('m1'), m[0]);
+				animateDigit(document.getElementById('m2'), m[1]);
+			
+				animateDigit(document.getElementById('s1'), s[0]);
+				animateDigit(document.getElementById('s2'), s[1]);
+			}
+			
+			(function init(){
+				 const now = new Date();
+				 const h = String(now.getHours()).padStart(2,'0');
+				 const m = String(now.getMinutes()).padStart(2,'0');
+				 //const s = String(now.getSeconds()).padStart(2,'0');
+			
+				 const ids = ['h1', 'h2', 'm1', 'm2'];
+				 //const ids = ['h1', 'h2', 'm1', 'm2', 's1', 's2'];
+				 const vals = [h[0], h[1], m[0], m[1]];
+				 //const vals = [h[0], h[1], m[0], m[1], s[0], s[1]];
+			
+				 ids.forEach((id,i)=>{
+				 	const el = document.getElementById(id);
+				 	el.setAttribute('data-value', vals[i]);
+				 	el.innerHTML = `<div class="panel old"><span>${vals[i]}</span></div>`;
+				 });
+			
+				setInterval(tick, 1000);
+			})();
+			</script>
+
         <script src="content/scripts/global.js"></script>
     </body>
 </html>
