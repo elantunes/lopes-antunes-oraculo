@@ -66,6 +66,31 @@ function inicializarElementos() {
     elementos.dataHoraData = document.querySelector('#data-hora-data');
 }
 
+function mostrarCursor() {
+    const agora = Date.now();
+    
+    // Throttle para mousemove - só processa se passou o tempo mínimo
+    if (agora - ultimaAtualizacaoCursor < throttleCursor)
+        return;
+
+    ultimaAtualizacaoCursor = agora;
+
+    // Só manipula DOM se necessário
+    if (document.body.classList.contains('cursor-hidden'))
+        document.body.classList.remove('cursor-hidden');
+    
+    clearTimeout(timeoutCursor);
+    timeoutCursor = setTimeout(ocultarCursor, tempoInatividadeCursor);
+}
+
+function ocultarCursor() {
+    // Só manipula DOM se necessário
+    if (!document.body.classList.contains('cursor-hidden')) {
+        document.body.classList.add('cursor-hidden');
+        console.log('Cursor ocultado por inatividade');
+    }
+}
+
 /**
  * Posiciona o container com id "data-hora" em uma posição aleatória na janela.
  * A posição é escolhida de forma a garantir que o container caiba inteiramente na
@@ -73,6 +98,47 @@ function inicializarElementos() {
  */
 function posicionarDataHoraAleatoriamente() {
     const retangulo = elementos.dataHora.getBoundingClientRect();
-    elementos.dataHora.style.top = `${Math.floor(Math.random() * (window.innerHeight - retangulo.height))}px`;
-    elementos.dataHora.style.left = `${Math.floor(Math.random() * (window.innerWidth - retangulo.width))}px`;
+    elementos.dataHora.style.top = `${Math.floor(Math.random() * (innerHeight - retangulo.height))}px`;
+    elementos.dataHora.style.left = `${Math.floor(Math.random() * (innerWidth - retangulo.width))}px`;
 }
+
+// Controle de cursor
+const segundo = 1000;
+const minuto = segundo * 60;
+const intervaloAtulizacaoDataHora = segundo * 20;
+const intervaloReposicionamento = minuto * 5;
+const tempoInatividadeCursor = minuto * .1; // 5 minutos
+
+let timeoutCursor;
+let ultimaAtualizacaoCursor = 0;
+const throttleCursor = 100; // Throttle de 100ms para mousemove
+
+// Inicialização
+(function init() {
+    // Eventos que indicam interação do usuário
+    // mousemove precisa de throttle especial
+    let throttleTimeout;
+    document.addEventListener('mousemove', () => {
+        if (!throttleTimeout)
+            throttleTimeout = setTimeout(() => {
+                mostrarCursor();
+                throttleTimeout = null;
+            }, throttleCursor);
+    }, { passive: true });
+
+    // Outros eventos não precisam de throttle
+    const outrosEventos = ['mousedown', 'mouseup', 'click', 'touchstart', 'touchmove', 'keydown', 'scroll'];
+    outrosEventos.forEach(evento => {
+        document.addEventListener(evento, mostrarCursor, { passive: true });
+    });
+
+    // Inicia o timeout para ocultar o cursor após o tempo de inatividade
+    timeoutCursor = setTimeout(ocultarCursor, tempoInatividadeCursor);
+
+    // Inicializa elementos DOM antes de usar
+    inicializarElementos();
+    atualizarDataHora();
+
+    setInterval(atualizarDataHora, intervaloAtulizacaoDataHora);
+    setInterval(posicionarDataHoraAleatoriamente, intervaloReposicionamento);
+})();
