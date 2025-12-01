@@ -57,10 +57,7 @@ body.cursor-hidden {
 }
 
 #data-hora {
-    display: inline-block;
     position: absolute;
-    text-align: center;
-    width: fit-content;
 }
 
 #data-hora-hora {
